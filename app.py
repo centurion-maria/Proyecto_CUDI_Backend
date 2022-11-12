@@ -20,22 +20,43 @@ def getProduct():
         return jsonify(toReturn), 200
     except Exception:
         exception("[SERVER]: Error ->")
-        return jsonify({"msg": "Ha ocurrido un error"}), 500
+        return jsonify({"mensaje": "Ha ocurrido un error"}), 500
 
 
 @cross_origin()
 @app.route("/productos/<nombre>", methods=["GET"])
-def getProductByName():
+def getProductByName(nombre):
     try:
-        marcaProducto = request.args["name"]
-        producto = Productos.query.filter_by(name=marcaProducto).first()
-        if not producto:
-            return jsonify({"msg": "Este producto no existe"}), 200
+        productos = db.session.query(Productos).filter(Productos.nombre.startswith(nombre))
+        if not productos:
+            return jsonify({"mensaje": "Este producto no existe"}), 200
         else:
-            return jsonify(producto.serialize()), 200
+            response = [producto.serialize() for producto in productos]
+            return jsonify(response), 200
     except Exception:
         exception("[SERVER]: Error ->")
-        return jsonify({"msg": "Ha ocurrido un error"}), 500
+        return jsonify({"mensaje": "Ha ocurrido un error"}), 500
+
+
+@app.route('/productos/eliminar/<id>', methods=['DELETE'])
+def eliminarProducto(id):
+        producto = db.session.query(Productos).filter(Productos.id == id).first()
+        db.session.delete(producto)
+        db.session.commit()
+        return "producto eliminado"
+
+
+@app.route('/productos', methods=['POST'])
+def nuevoProducto():
+    nuevoProducto = Productos(
+        nombre=request.form.get('nombre'),
+        cantidad=request.form.get('cantidad'),
+        precio=request.form.get('precio'),
+        imagen=request.form.get('imagen')
+    )
+    db.session.add(nuevoProducto)
+    db.session.commit()
+    return jsonify(nuevoProducto.serialize())
 
 
 if __name__ == '__main__':
