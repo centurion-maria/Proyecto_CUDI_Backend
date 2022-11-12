@@ -1,18 +1,17 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import *
 
 db = SQLAlchemy()
 
 
 class Productos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100))
-    cantidad = db.Column(db.Integer)
-    precio = db.Column(db.Integer)
-    imagen = db.Column(db.String(100))
+    nombre = db.Column(db.String(100), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    precio = db.Column(db.Integer, nullable=False)
+    imagen = db.Column(db.String(100), nullable=False)
 
-    def __init__(self, id, nombre, cantidad, precio, imagen):
+    def __init__(self, nombre, cantidad, precio, imagen):
         super().__init__()
-        self.id = id
         self.nombre = nombre
         self.cantidad = cantidad
         self.precio = precio

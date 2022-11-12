@@ -15,38 +15,32 @@ db.init_app(app)
 @cross_origin()
 @app.route("/productos", methods=["GET"])
 def getProduct():
-    try:
-        productos = Productos.query.all()
-        toReturn = [producto.serialize() for producto in productos]
-        return jsonify(toReturn), 200
-    except Exception:
-        exception("[SERVER]: Error ->")
-        return jsonify({"mensaje": "Ha ocurrido un error"}), 500
+    productos = Productos.query.all()
+    toReturn = [producto.serialize() for producto in productos]
+    return jsonify(toReturn), 200
 
 
 @cross_origin()
 @app.route("/productos/<nombre>", methods=["GET"])
 def getProductByName(nombre):
-    try:
-        productos = db.session.query(Productos).filter(Productos.nombre.startswith(nombre))
-        if not productos:
-            return jsonify({"mensaje": "Este producto no existe"}), 200
-        else:
-            response = [producto.serialize() for producto in productos]
-            return jsonify(response), 200
-    except Exception:
-        exception("[SERVER]: Error ->")
-        return jsonify({"mensaje": "Ha ocurrido un error"}), 500
+    productos = db.session.query(Productos).filter(Productos.nombre.startswith(nombre))
+    if not productos:
+        return jsonify({"mensaje": "Este producto no existe"}), 200
+    else:
+        response = [producto.serialize() for producto in productos]
+        return jsonify(response), 200
 
 
+@cross_origin()
 @app.route('/productos/eliminar/<id>', methods=['DELETE'])
 def eliminarProducto(id):
-        producto = db.session.query(Productos).filter(Productos.id == id).first()
-        db.session.delete(producto)
-        db.session.commit()
-        return "producto eliminado"
+    producto = db.session.query(Productos).filter(Productos.id == id).first()
+    db.session.delete(producto)
+    db.session.commit()
+    return "producto eliminado"
 
 
+@cross_origin()
 @app.route('/productos', methods=['POST'])
 def nuevoProducto():
     nuevoProducto = Productos(
@@ -57,7 +51,7 @@ def nuevoProducto():
     )
     db.session.add(nuevoProducto)
     db.session.commit()
-    return jsonify(nuevoProducto.serialize())
+    return jsonify(nuevoProducto)
 
 
 if __name__ == '__main__':
