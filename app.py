@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from Models import db, Productos
 from logging import exception
@@ -6,7 +7,7 @@ from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADER'] = 'Content-Type'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///D:/Malena/Informatica/Planeta-Mascotas/App/database/productos.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
