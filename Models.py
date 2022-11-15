@@ -11,7 +11,6 @@ class Productos(db.Model):
     imagen = db.Column(db.String(100), nullable=False)
 
     def __init__(self, nombre, cantidad, precio, imagen):
-        super().__init__()
         self.nombre = nombre
         self.cantidad = cantidad
         self.precio = precio

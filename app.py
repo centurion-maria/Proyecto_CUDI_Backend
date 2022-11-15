@@ -1,13 +1,11 @@
-import os
 from flask import Flask, jsonify, request
 from Models import db, Productos
-from logging import exception
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADER'] = 'Content-Type'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///D:/Malena/Informatica/Planeta-Mascotas/App/database/productos.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
@@ -25,14 +23,14 @@ def getProduct():
 def getProductByName(nombre):
     productos = db.session.query(Productos).filter(Productos.nombre.startswith(nombre))
     if not productos:
-        return jsonify({"mensaje": "Este producto no existe"}), 200
+        return jsonify({"mensaje": "Este producto no existe"}), 404
     else:
         response = [producto.serialize() for producto in productos]
         return jsonify(response), 200
 
 
 @cross_origin()
-@app.route('/productos/eliminar/<id>', methods=['DELETE'])
+@app.route('/productos/<id>', methods=['DELETE'])
 def eliminarProducto(id):
     producto = db.session.query(Productos).filter(Productos.id == id).first()
     db.session.delete(producto)
@@ -43,15 +41,16 @@ def eliminarProducto(id):
 @cross_origin()
 @app.route('/productos', methods=['POST'])
 def nuevoProducto():
-    nuevoProducto = Productos(
-        nombre=request.form.get('nombre'),
-        cantidad=request.form.get('cantidad'),
-        precio=request.form.get('precio'),
-        imagen=request.form.get('imagen')
+    request_body = request.get_json()
+    producto = Productos(
+        nombre=request_body.get('nombre'),
+        cantidad=request_body.get('cantidad'),
+        precio=request_body.get('precio'),
+        imagen=request_body.get('imagen')
     )
-    db.session.add(nuevoProducto)
+    db.session.add(producto)
     db.session.commit()
-    return jsonify(nuevoProducto)
+    return jsonify(producto.serialize())
 
 
 if __name__ == '__main__':
